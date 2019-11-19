@@ -56,10 +56,10 @@ namespace Cosmetic.Models
                 string connectionString = configuration.GetConnectionString("WebMyPham");
                 /////////////////////////////////////////////////////////////////////////
                 //Sử dụng PostgreSQL Entity Framework Core
-                //optionsBuilder.UseNpgsql(connectionString);
+                optionsBuilder.UseNpgsql(connectionString);
                 
                 //Sử dụng Microsoft SQL Server
-                optionsBuilder.UseSqlServer(connectionString);
+                //optionsBuilder.UseSqlServer(connectionString);
                 //////////////////////////////////////////////////////////////////////////
             }
         }
