@@ -38,5 +38,9 @@ namespace Cosmetic.Models
         public ICollection<BinhLuan> BinhLuan { get; set; }
         public ICollection<HoaDon> HoaDon { get; set; }
         public ICollection<YeuThich> YeuThich { get; set; }
+
+        public string AuthyId { get; set; }
+        public string PhoneNumber { get; set; }
+        public bool PhoneNumberConfirmed { get; set; }
     }
 }

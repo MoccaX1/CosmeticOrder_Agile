@@ -12,9 +12,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ReflectionIT.Mvc.Paging;
 using Microsoft.AspNetCore.Razor.TagHelpers;
+using Cosmetic.Services;
 //using Services.PayPal;
 using Cosmetic.Models;
 using Cosmetic.GATagHelpers;
+using EC.SecurityService.Services;
 
 namespace Cosmetic
 {
@@ -44,8 +46,14 @@ namespace Cosmetic
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            
+            // 2FA
+            services.AddHttpClient();
+            services.AddTransient<IAuthy, Authy>();
+            //SMS
+            services.AddTransient<ISmsService, SmsService>();
+
             services.AddSession();
             services.AddPaging(options => {
                 options.ViewName = "Bootstrap4";
