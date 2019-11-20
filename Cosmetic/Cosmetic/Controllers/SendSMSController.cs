@@ -111,21 +111,21 @@ namespace Cosmetic.Controllers
             return Content($"Không có khách hàng nào có điện thoại: {phone}");
         }
 
-                public async Task<IActionResult> SendSms(string phone, string content)
+        public async Task<IActionResult> SendSms(string phone, string content)
         {
             SmsMessage model = new SmsMessage
             {
-                NameTo = "Hien",
-                NumberFrom = "+84854774690",
-                NumberTo = "+84989366990",
+                NameTo = "MoccaX1",
+                NumberFrom = "+12055649222",
+                NumberTo = "+84941920905",
                 Body = "This is SMS from EC HCMUE",
                 Greeting = "HCMUEr",
                 Signature = "HIENLTH"
             };
 
-            var result = await _smsService.Send(model);
+        var result = await _smsService.Send(model);
 
-            return Json(result);
+        return Json(result);
         }
     }
 } 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -6,17 +7,24 @@ using Cosmetic.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.RegularExpressions;
 using Cosmetic.Encrytions;
+using Newtonsoft.Json;
+using EC.SecurityService.Common;
+using Cosmetic.Services;
+using EC.SecurityService.Services;
 
 namespace Cosmetic.Controllers
 {
     public class DangNhapController : Controller
     {
+        private readonly IAuthy _authy;
         private readonly MyPhamContext db;
+        private static string phonenum;
         //private string key = "Cyg-X1"; //key to encrypt and decrypt
         PasswordHasher passwordHasher = new PasswordHasher();
         //Encrytion ecr = new Encrytion(); // Encrypt HoTen, DiaChi, DienThoai, Email 
-        public DangNhapController(MyPhamContext context)
+        public DangNhapController(MyPhamContext context, IAuthy auth )
         {
+            _authy = auth;
             db = context;
         }
         public IActionResult Index()
@@ -51,6 +59,7 @@ namespace Cosmetic.Controllers
         [Route("[controller]/[action]")]
         public async Task<IActionResult>DangKy([Bind("MaKh,MatKhau,HoTen,GioiTinh,NgaySinh,DiaChi,DienThoai,Email,HieuLuc,VaiTro,RandomKey")] KhachHang khachHang)
         {
+            phonenum = khachHang.DienThoai;
             try 
             {
                 if (ModelState.IsValid)
@@ -59,7 +68,7 @@ namespace Cosmetic.Controllers
                     {
                         throw new UserDefException("Mật khẩu đã đặt không hợp lệ!");
                     }
-                    if (!Regex.IsMatch(khachHang.DienThoai, @"0(3\d{8}|5\d{8}|7\d{8}|8\d{8}|9\d{8})", RegexOptions.IgnoreCase))
+                    if (!Regex.IsMatch(khachHang.DienThoai, @"(3\d{8}|5\d{8}|7\d{8}|8\d{8}|9\d{8})", RegexOptions.IgnoreCase))
                     {
                         throw new UserDefException("Số điện thoại không hợp lệ!");
                     }
@@ -74,9 +83,64 @@ namespace Cosmetic.Controllers
                         khachHang.DiaChi = ecr.EncryptString(khachHang.DiaChi, key);
                         khachHang.DienThoai = ecr.EncryptString(khachHang.DienThoai, key);
                         khachHang.Email = ecr.EncryptString(khachHang.Email, key);*/
-                        db.Add(khachHang);                
-                        await db.SaveChangesAsync();
-                        return RedirectToAction("Index", "Home");
+                        khachHang.PhoneNumber = khachHang.DienThoai;
+
+                        UserModel userModel = new UserModel
+                        {
+                            Email = khachHang.Email,
+                            CountryCode = "+84",
+                            PhoneNumber = phonenum
+                        };
+
+                        var authyId = await _authy.RegisterUserAsync(userModel).ConfigureAwait(false);
+
+                        if (string.IsNullOrEmpty(authyId))
+                        {                
+                            //return Json(new { success = false });
+                            throw new UserDefException("Số điện thoại AuthyID?");
+                        }
+                        else
+                        {
+                            //update authyId in database
+                            //khachHang = db.KhachHang.SingleOrDefault(kh => kh.PhoneNumber == phonenum);
+
+                            if(khachHang != null)
+                            {
+                                khachHang.AuthyId = authyId;
+                                khachHang.PhoneNumberConfirmed = false;
+                                db.Add(khachHang);                
+                                await db.SaveChangesAsync();
+                            }
+
+                            //return Json(new { success = true, authyId = authyId });
+                        }
+                        //return RedirectToAction("Index", "Home");
+
+                        //Phone ==> read DB to indicate AuthyId
+                        //khachHang = db.KhachHang.SingleOrDefault(kh => kh.PhoneNumber == phonenum);
+
+                        if (khachHang != null && !string.IsNullOrEmpty(khachHang.AuthyId))
+                        {
+                            var sendSMSResponse = await _authy.SendSmsAsync(khachHang.AuthyId).ConfigureAwait(false);
+
+                            if (sendSMSResponse.StatusCode == HttpStatusCode.OK)
+                            {
+                                var smsVerificationSucceedObject = JsonConvert.DeserializeObject<AccessCodeVerifyResult>(await sendSMSResponse.Content.ReadAsStringAsync());
+                                if (smsVerificationSucceedObject.Success)
+                                {
+                                    //Send SMS success
+                                    return View("XacMinh");
+                                    throw new UserDefException($"Gửi token thành công tới {phonenum}");
+                                    
+                                }
+                                else
+                                {
+                                    //Fail
+                                    throw new UserDefException($"Có lỗi gửi tin nhắn tới {phonenum}");
+                                }
+                            }
+                        }
+                        throw new UserDefException($"Không có khách hàng nào có điện thoại: {phonenum}");                        
                     }
                 }
             }
@@ -88,7 +152,7 @@ namespace Cosmetic.Controllers
             {
                 ViewBag.Result = e.Message;
             }
-            return View(khachHang);
+            return View("DangKy");
         }
         [Route("[controller]/[action]")]
         public IActionResult DangXuat()
@@ -96,6 +160,44 @@ namespace Cosmetic.Controllers
             //xóa session
             HttpContext.Session.Remove("TaiKhoan");
             return RedirectToAction("Index", "Home");
+        }
+
+        [Route("[controller]/[action]")]
+        public async Task<IActionResult> XacMinh()
+        {
+            try 
+            {
+                string token = HttpContext.Request.Form["token"].ToString();
+                KhachHang khachHang = db.KhachHang.SingleOrDefault(kh => kh.PhoneNumber == phonenum);
+
+                if (khachHang != null && !string.IsNullOrEmpty(khachHang.AuthyId))
+                {
+                    var validationResult = await _authy.VerifyTokenAsync(khachHang.AuthyId, token).ConfigureAwait(false);
+
+                    if (validationResult.Succeeded)
+                    {
+                        khachHang.PhoneNumberConfirmed = true;
+                        db.SaveChanges();
+                        ViewBag.Result = $"Success. Your mobile phone {phonenum} verify successfully.";
+                        /*return Json(new
+                        {
+                            Success = true,
+                            Message = $"Your mobile phone {phonenum} verify successfully."
+                        });*/
+                        
+                    }
+                }
+                throw new UserDefException($"Không có khách hàng nào có điện thoại: {phonenum}");
+            }
+            catch (UserDefException e)
+            {
+                ViewBag.Result = e.Message;
+            }
+            catch (Exception e)
+            {
+                ViewBag.Result = e.Message;
+            }
+            return View("XacMinh");
         }
     }
 }
