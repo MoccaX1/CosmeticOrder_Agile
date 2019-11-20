@@ -17,7 +17,7 @@ namespace Cosmetic.Controllers
     public class DangNhapController : Controller
     {
         private readonly IAuthy _authy;
-        private readonly MyPhamContext db;
+        private readonly MyPhamContext db;      
         private static string phonenum;
         //private string key = "Cyg-X1"; //key to encrypt and decrypt
         PasswordHasher passwordHasher = new PasswordHasher();
@@ -32,7 +32,7 @@ namespace Cosmetic.Controllers
             return View();
         }
         [Route("[controller]/[action]")]
-        public IActionResult DangNhap(LoginViewModel model)
+        public async Task<IActionResult> DangNhap(LoginViewModel model)
         {
             if (ModelState.IsValid)
             {
@@ -43,8 +43,47 @@ namespace Cosmetic.Controllers
                     ModelState.AddModelError("Loi", "Thông tin tài khoản hoặc mật khẩu không hợp lệ.");
                     return View("Index");
                 }
-                HttpContext.Session.Set("TaiKhoan", kh);
-                return RedirectToAction("Index", "Home");
+                else
+                {
+                    try
+                    {
+                        //HttpContext.Session.Set("TaiKhoan", kh);
+                        //return RedirectToAction("Index", "Home");
+                        if (kh != null && !string.IsNullOrEmpty(kh.AuthyId))
+                        {
+                            phonenum = kh.DienThoai;
+                            var sendSMSResponse = await _authy.SendSmsAsync(kh.AuthyId).ConfigureAwait(false);
+
+                            if (sendSMSResponse.StatusCode == HttpStatusCode.OK)
+                            {
+                                var smsVerificationSucceedObject = JsonConvert.DeserializeObject<AccessCodeVerifyResult>(await sendSMSResponse.Content.ReadAsStringAsync());
+                                if (smsVerificationSucceedObject.Success)
+                                {
+                                    //Send SMS success
+                                    return View("XacMinhDangNhap");
+                                    throw new UserDefException($"Gửi token thành công tới {phonenum}");
+                                    
+                                }
+                                else
+                                {
+                                    //Fail
+                                    throw new UserDefException($"Có lỗi gửi tin nhắn tới {phonenum}");
+                                }
+                            }
+                        }
+                        else
+                            throw new UserDefException($"Không có khách hàng nào có điện thoại: {phonenum}");
+                    }
+                    catch (UserDefException e)
+                    {
+                        ViewBag.Result = e.Message;
+                    }
+                    catch (Exception e)
+                    {
+                         ViewBag.Result = e.Message;
+                    }
+                }
+                
             }
             return View("Index");
         }
@@ -97,7 +136,7 @@ namespace Cosmetic.Controllers
                         if (string.IsNullOrEmpty(authyId))
                         {                
                             //return Json(new { success = false });
-                            throw new UserDefException("Số điện thoại AuthyID?");
+                            throw new UserDefException("Số điện thoại chưa chuẩn?");
                         }
                         else
                         {
@@ -140,7 +179,8 @@ namespace Cosmetic.Controllers
                                 }
                             }
                         }
-                        throw new UserDefException($"Không có khách hàng nào có điện thoại: {phonenum}");                        
+                        else
+                            throw new UserDefException($"Không có khách hàng nào có điện thoại: {phonenum}");                        
                     }
                 }
             }
@@ -178,16 +218,18 @@ namespace Cosmetic.Controllers
                     {
                         khachHang.PhoneNumberConfirmed = true;
                         db.SaveChanges();
-                        ViewBag.Result = $"Success. Your mobile phone {phonenum} verify successfully.";
                         /*return Json(new
                         {
                             Success = true,
-                            Message = $"Your mobile phone {phonenum} verify successfully."
+                            Message = $"Số điện thoại của bạn {phonenum} đã xác minh thành công."
                         });*/
-                        
+                        ViewBag.Result = 
+                        $"Số điện thoại của bạn +84{phonenum} đã xác minh thành công. Vui lòng chờ chuyển đến trang Đăng nhập...";
+                        Response.Headers.Add("REFRESH","5;URL=../DangNhap/Index");
                     }
                 }
-                throw new UserDefException($"Không có khách hàng nào có điện thoại: {phonenum}");
+                else
+                    throw new UserDefException($"Không có khách hàng nào có điện thoại: {phonenum}");
             }
             catch (UserDefException e)
             {
@@ -198,6 +240,44 @@ namespace Cosmetic.Controllers
                 ViewBag.Result = e.Message;
             }
             return View("XacMinh");
+        }
+        [Route("[controller]/[action]")]
+        public async Task<IActionResult> XacMinhDangNhap()
+        {
+            try 
+            {
+                string token = HttpContext.Request.Form["token"].ToString();
+                KhachHang khachHang = db.KhachHang.SingleOrDefault(kh => kh.PhoneNumber == phonenum);
+                if (khachHang != null && !string.IsNullOrEmpty(khachHang.AuthyId))
+                {
+                    var validationResult = await _authy.VerifyTokenAsync(khachHang.AuthyId, token).ConfigureAwait(false);
+                    if (validationResult.Succeeded)
+                    {
+                        khachHang.PhoneNumberConfirmed = true;
+                        db.SaveChanges();
+                        HttpContext.Session.Set("TaiKhoan", khachHang);
+                        /*return Json(new
+                        {
+                            Success = true,
+                            Message = $"Số điện thoại của bạn {phonenum} đã xác minh thành công."
+                        });*/
+                        ViewBag.Result = 
+                        $"Số điện thoại của bạn +84{phonenum} đã xác minh thành công. Vui lòng chờ chuyển đến trang chủ...";
+                        Response.Headers.Add("REFRESH","5;URL=../Home");
+                    }
+                }
+                else
+                    throw new UserDefException($"Không có khách hàng nào có điện thoại: {phonenum}");
+            }
+            catch (UserDefException e)
+            {
+                ViewBag.Result = e.Message;
+            }
+            catch (Exception e)
+            {
+                ViewBag.Result = e.Message;
+            }
+            return View("XacMinhDangNhap");
         }
     }
 }
