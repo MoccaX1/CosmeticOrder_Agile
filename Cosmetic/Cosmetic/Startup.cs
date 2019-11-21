@@ -36,9 +36,10 @@ namespace Cosmetic
             services.AddOptions();
             // Register the Google Analytics configuration
             services.Configure<GoogleAnalyticsOptions>(options => Configuration.GetSection("GoogleAnalytics").Bind(options));
-
             // Register the TagHelperComponent
             services.AddTransient<ITagHelperComponent, GoogleAnalyticsTagHelperComponent>();
+            // Google Analytics (2 dòng trên)
+            
             services.Configure<CookiePolicyOptions>(options =>
             {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.

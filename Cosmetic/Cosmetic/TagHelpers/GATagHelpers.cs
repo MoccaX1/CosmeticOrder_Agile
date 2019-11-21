@@ -1,3 +1,4 @@
+// Thêm Google Analytics qua code tự động nhúng vào head của web
 using System;
 using System.IO;
 using System.Threading.Tasks;
