@@ -17,15 +17,17 @@ namespace Cosmetic.Controllers
     public class DangNhapController : Controller
     {
         private readonly IAuthy _authy;
+        private readonly ISmsService _smsService;
         private readonly MyPhamContext db;      
         private static string phonenum;
         //private string key = "Cyg-X1"; //key to encrypt and decrypt
         PasswordHasher passwordHasher = new PasswordHasher();
         //Encrytion ecr = new Encrytion(); // Encrypt HoTen, DiaChi, DienThoai, Email 
-        public DangNhapController(MyPhamContext context, IAuthy auth )
+        public DangNhapController(MyPhamContext context, IAuthy auth, ISmsService smsService)
         {
             _authy = auth;
             db = context;
+            _smsService = smsService;
         }
         public IActionResult Index()
         {
@@ -223,9 +225,26 @@ namespace Cosmetic.Controllers
                             Success = true,
                             Message = $"Số điện thoại của bạn {phonenum} đã xác minh thành công."
                         });*/
+                        SmsMessage model = new SmsMessage
+                        {
+                            NameTo = khachHang.HoTen,
+                            NumberFrom = "+12055649222",
+                            NumberTo = "+84" + phonenum,
+                            Body = "Cảm ơn bạn đã đăng ký Cosmetic",
+                            Greeting = "Thanh",
+                            Signature = "Cosmetic Project"
+                        };
+
+                        await _smsService.Send(model);
+
                         ViewBag.Result = 
                         $"Số điện thoại của bạn +84{phonenum} đã xác minh thành công. Vui lòng chờ chuyển đến trang Đăng nhập...";
                         Response.Headers.Add("REFRESH","5;URL=../DangNhap/Index");
+                    }
+                    else
+                    {
+                        ViewBag.Result = 
+                        $"Không thể xác minh +84{phonenum}. Vui lòng kiểm tra SĐT hoặc mã đã nhập có đúng không.";
                     }
                 }
                 else
@@ -264,6 +283,11 @@ namespace Cosmetic.Controllers
                         ViewBag.Result = 
                         $"Số điện thoại của bạn +84{phonenum} đã xác minh thành công. Vui lòng chờ chuyển đến trang chủ...";
                         Response.Headers.Add("REFRESH","5;URL=../Home");
+                    }
+                    else
+                    {
+                        ViewBag.Result = 
+                        $"Không thể xác minh +84{phonenum}. Vui lòng kiểm tra SĐT hoặc mã đã nhập có đúng không.";
                     }
                 }
                 else

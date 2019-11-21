@@ -12,7 +12,7 @@ namespace Cosmetic.Controllers
         [Route("[controller]/[action]")]
         public IActionResult Index()
         {
-                return View();
+            return View();
         }
         private readonly MyPhamContext db;
         public AdminController(MyPhamContext context)
