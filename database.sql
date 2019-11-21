@@ -868,3 +868,12 @@ USE [master]
 GO
 ALTER DATABASE [MyPham] SET  READ_WRITE 
 GO
+
+ALTER TABLE [dbo].[KhachHang] ADD [AuthyId] VARCHAR(50) NULL
+GO
+
+ALTER TABLE [dbo].[KhachHang] ADD [PhoneNumber] VARCHAR(50) NULL
+GO
+
+ALTER TABLE [dbo].[KhachHang] ADD [PhoneNumberConfirmed] bit DEFAULT (0)
+GO
