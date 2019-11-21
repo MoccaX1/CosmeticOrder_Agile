@@ -9,6 +9,22 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <style>
+    #myProgress {
+    width: 100%;
+    background-color: #ddd;
+    }
+
+    #myBar {
+    width: 10%;
+    height: 2px;
+    background-color: #800080;
+    text-align: center;
+    line-height: 30px;
+    color: white;
+    }
+    </style>
+
     <meta name="google-site-verification" content="GEr_2ywK-gY5kl8hyTh4U-kkG5PgyZY-sYOH81ROzOc" />
     <meta charset="utf-8">
     <meta property="fb:app_id" content="443695919745450" />
@@ -95,7 +111,9 @@
             });
         </script>
         -->
-
+            <div id="myProgress">
+                <div id="myBar"></div>
+            </div>
         <div id="top">
             <div class="container">
                 <div class="row">
@@ -460,5 +478,29 @@
         })(document, window, 'https://widgetv4.subiz.com/static/js/app.js', 'subiz');
         subiz('setAccount', 'acqknxhqfwngalhwoiwc');</script>
     <!-- End Subiz -->
+    <!-- Start Script progress bar làm màu -->
+    <script>
+        var i = 0;
+        if (i == 0) 
+        {
+            i = 1;
+            var elem = document.getElementById("myBar");
+            var width = 5;
+            var id = setInterval(frame, 1);
+            function frame() 
+            {
+                if (width >= 100) {
+                    clearInterval(id);
+                    i = 0;
+                } 
+                else 
+                {
+                    width++;
+                    elem.style.width = width + "%";
+                }
+            }
+        }
+    </script>
+    <!-- End Script progress bar làm màu -->
 </body>
 </html>
