@@ -10,9 +10,14 @@ namespace Cosmetic.Controllers
     public class TinTuc : Controller
     {
         [Route("[controller]/[action]")]
-        public IActionResult Index()
+        public IActionResult VnExpressIndex()
         {
-            return View("TinTuc");
+            return View("TinTucVNExpress");
+        }
+        [Route("[controller]/[action]")]
+        public IActionResult DanTriIndex()
+        {
+            return View("TinTucDanTri");
         }
     }
 }
