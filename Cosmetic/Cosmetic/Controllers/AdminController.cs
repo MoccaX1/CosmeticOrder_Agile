@@ -24,5 +24,32 @@ namespace Cosmetic.Controllers
         {
             return View();
         }
+        [Route("[controller]/[action]")]
+        [HttpPost]
+        public IActionResult Login(AdminLogin model)
+        {
+            if (ModelState.IsValid)
+            {
+                NhanVien nv = db.NhanVien.SingleOrDefault(p => p.MaNv == model.MaNv && p.MatKhau == model.MatKhau);
+                if (nv == null)
+                {
+                    ModelState.AddModelError("Loi", "Tài khoản hoặc mật khẩu không đúng");
+                    return View();
+                }
+                //ghi session
+                //HttpContext.Session.SetString("MaKH", kh.MaKh);
+                HttpContext.Session.Set("MaNv", nv);
+                //chuyển tới trang HangHoa (--> MyProfile)
+                return RedirectToAction("Index", "Admin");
+            }
+            return View();
+        }
+        [Route("[controller]/[action]")]
+        public IActionResult Logout()
+        {
+            //xóa session
+            HttpContext.Session.Remove("MaNv");
+            return RedirectToAction("Login", "Admin");
+        }
     }
 }
