@@ -13,7 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using ReflectionIT.Mvc.Paging;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Cosmetic.Services;
-//using Services.PayPal;
+using Services.PayPal;
 using Cosmetic.Models;
 using Cosmetic.GATagHelpers;
 using EC.SecurityService.Services;

@@ -34,6 +34,7 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="9.0.0" />
+    <PackageReference Include="BraintreeHttp-Dotnet" Version="0.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.1.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.1.1" />
@@ -45,6 +46,7 @@
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.10" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.1.1.1" />
+    <PackageReference Include="PayPal" Version="2.0.0-rc2" />
     <PackageReference Include="ReflectionIT.Mvc.Paging" Version="3.0.0" />
     <PackageReference Include="Twilio" Version="5.35.1" />
   </ItemGroup>
