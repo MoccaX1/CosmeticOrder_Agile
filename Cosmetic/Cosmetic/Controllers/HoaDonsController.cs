@@ -9,17 +9,16 @@ using Cosmetic.Models;
 
 namespace Cosmetic.Controllers
 {
-    public class SanPhamsController : Controller
+    public class HoaDonsController : Controller
     {
         private readonly MyPhamContext _context;
 
-        public SanPhamsController(MyPhamContext context)
+        public HoaDonsController(MyPhamContext context)
         {
             _context = context;
         }
 
-        // GET: SanPhams
-        [Route("[controller]/[action]")]
+        // GET: HoaDons
         public async Task<IActionResult> Index()
         {
             if (HttpContext.Session.Get<NhanVien>("MaNv") == null)
@@ -28,13 +27,12 @@ namespace Cosmetic.Controllers
             }
             else
             {
-                var myPhamContext = _context.SanPham.Include(s => s.MaLoaiNavigation).Include(s => s.MaNccNavigation);
+                var myPhamContext = _context.HoaDon.Include(h => h.MaKhNavigation).Include(h => h.MaNvNavigation).Include(h => h.MaTrangThaiNavigation);
                 return View(await myPhamContext.ToListAsync());
             }
         }
 
-        // GET: SanPhams/Details/5
-        [Route("[controller]/[action]")]
+        // GET: HoaDons/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (HttpContext.Session.Get<NhanVien>("MaNv") == null)
@@ -48,21 +46,21 @@ namespace Cosmetic.Controllers
                     return NotFound();
                 }
 
-                var sanPham = await _context.SanPham
-                    .Include(s => s.MaLoaiNavigation)
-                    .Include(s => s.MaNccNavigation)
-                    .FirstOrDefaultAsync(m => m.MaSp == id);
-                if (sanPham == null)
+                var hoaDon = await _context.HoaDon
+                    .Include(h => h.MaKhNavigation)
+                    .Include(h => h.MaNvNavigation)
+                    .Include(h => h.MaTrangThaiNavigation)
+                    .FirstOrDefaultAsync(m => m.MaHd == id);
+                if (hoaDon == null)
                 {
                     return NotFound();
                 }
 
-                return View(sanPham);
+                return View(hoaDon);
             }
         }
 
-        // GET: SanPhams/Create
-        [Route("[controller]/[action]")]
+        // GET: HoaDons/Create
         public IActionResult Create()
         {
             if (HttpContext.Session.Get<NhanVien>("MaNv") == null)
@@ -71,19 +69,19 @@ namespace Cosmetic.Controllers
             }
             else
             {
-                ViewData["MaLoai"] = new SelectList(_context.Loai, "MaLoai", "MaLoai");
-                ViewData["MaNcc"] = new SelectList(_context.NhaCungCap, "MaNcc", "MaNcc");
+                ViewData["MaKh"] = new SelectList(_context.KhachHang, "MaKh", "MaKh");
+                ViewData["MaNv"] = new SelectList(_context.NhanVien, "MaNv", "MaNv");
+                ViewData["MaTrangThai"] = new SelectList(_context.TrangThai, "MaTrangThai", "MaTrangThai");
                 return View();
             }
         }
 
-        // POST: SanPhams/Create
+        // POST: HoaDons/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [Route("[controller]/[action]")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("MaSp,TenSp,TenAlias,MaLoai,MoTa,DonGia,Hinh,GiaCu,MaNcc")] SanPham sanPham)
+        public async Task<IActionResult> Create([Bind("MaHd,MaKh,NgayDat,NgayGiao,MaNv,HoTen,DiaChi,CachThanhToan,CachVanChuyen,PhiVanChuyen,MaTrangThai,GhiChu,DienThoai,TenNgNhan,DtngNhan,DiaChiNgNhan")] HoaDon hoaDon)
         {
             if (HttpContext.Session.Get<NhanVien>("MaNv") == null)
             {
@@ -93,18 +91,18 @@ namespace Cosmetic.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    _context.Add(sanPham);
+                    _context.Add(hoaDon);
                     await _context.SaveChangesAsync();
                     return RedirectToAction(nameof(Index));
                 }
-                ViewData["MaLoai"] = new SelectList(_context.Loai, "MaLoai", "MaLoai", sanPham.MaLoai);
-                ViewData["MaNcc"] = new SelectList(_context.NhaCungCap, "MaNcc", "MaNcc", sanPham.MaNcc);
-                return View(sanPham);
+                ViewData["MaKh"] = new SelectList(_context.KhachHang, "MaKh", "MaKh", hoaDon.MaKh);
+                ViewData["MaNv"] = new SelectList(_context.NhanVien, "MaNv", "MaNv", hoaDon.MaNv);
+                ViewData["MaTrangThai"] = new SelectList(_context.TrangThai, "MaTrangThai", "MaTrangThai", hoaDon.MaTrangThai);
+                return View(hoaDon);
             }
         }
 
-        // GET: SanPhams/Edit/5
-        [Route("[controller]/[action]")]
+        // GET: HoaDons/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (HttpContext.Session.Get<NhanVien>("MaNv") == null)
@@ -118,24 +116,24 @@ namespace Cosmetic.Controllers
                     return NotFound();
                 }
 
-                var sanPham = await _context.SanPham.FindAsync(id);
-                if (sanPham == null)
+                var hoaDon = await _context.HoaDon.FindAsync(id);
+                if (hoaDon == null)
                 {
                     return NotFound();
                 }
-                ViewData["MaLoai"] = new SelectList(_context.Loai, "MaLoai", "MaLoai", sanPham.MaLoai);
-                ViewData["MaNcc"] = new SelectList(_context.NhaCungCap, "MaNcc", "MaNcc", sanPham.MaNcc);
-                return View(sanPham);
+                ViewData["MaKh"] = new SelectList(_context.KhachHang, "MaKh", "MaKh", hoaDon.MaKh);
+                ViewData["MaNv"] = new SelectList(_context.NhanVien, "MaNv", "MaNv", hoaDon.MaNv);
+                ViewData["MaTrangThai"] = new SelectList(_context.TrangThai, "MaTrangThai", "MaTrangThai", hoaDon.MaTrangThai);
+                return View(hoaDon);
             }
         }
 
-        // POST: SanPhams/Edit/5
+        // POST: HoaDons/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [Route("[controller]/[action]")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("MaSp,TenSp,TenAlias,MaLoai,MoTa,DonGia,Hinh,GiaCu,MaNcc")] SanPham sanPham)
+        public async Task<IActionResult> Edit(int id, [Bind("MaHd,MaKh,NgayDat,NgayGiao,MaNv,HoTen,CachThanhToan,CachVanChuyen,PhiVanChuyen,MaTrangThai,GhiChu,DienThoai,TenNgNhan,DtngNhan,DiaChiNgNhan")] HoaDon hoaDon)
         {
             if (HttpContext.Session.Get<NhanVien>("MaNv") == null)
             {
@@ -143,7 +141,7 @@ namespace Cosmetic.Controllers
             }
             else
             {
-                if (id != sanPham.MaSp)
+                if (id != hoaDon.MaHd)
                 {
                     return NotFound();
                 }
@@ -152,12 +150,12 @@ namespace Cosmetic.Controllers
                 {
                     try
                     {
-                        _context.Update(sanPham);
+                        _context.Update(hoaDon);
                         await _context.SaveChangesAsync();
                     }
                     catch (DbUpdateConcurrencyException)
                     {
-                        if (!SanPhamExists(sanPham.MaSp))
+                        if (!HoaDonExists(hoaDon.MaHd))
                         {
                             return NotFound();
                         }
@@ -168,14 +166,14 @@ namespace Cosmetic.Controllers
                     }
                     return RedirectToAction(nameof(Index));
                 }
-                ViewData["MaLoai"] = new SelectList(_context.Loai, "MaLoai", "MaLoai", sanPham.MaLoai);
-                ViewData["MaNcc"] = new SelectList(_context.NhaCungCap, "MaNcc", "MaNcc", sanPham.MaNcc);
-                return View(sanPham);
+                ViewData["MaKh"] = new SelectList(_context.KhachHang, "MaKh", "MaKh", hoaDon.MaKh);
+                ViewData["MaNv"] = new SelectList(_context.NhanVien, "MaNv", "MaNv", hoaDon.MaNv);
+                ViewData["MaTrangThai"] = new SelectList(_context.TrangThai, "MaTrangThai", "MaTrangThai", hoaDon.MaTrangThai);
+                return View(hoaDon);
             }
         }
 
-        // GET: SanPhams/Delete/5
-        [Route("[controller]/[action]")]
+        // GET: HoaDons/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (HttpContext.Session.Get<NhanVien>("MaNv") == null)
@@ -189,21 +187,21 @@ namespace Cosmetic.Controllers
                     return NotFound();
                 }
 
-                var sanPham = await _context.SanPham
-                    .Include(s => s.MaLoaiNavigation)
-                    .Include(s => s.MaNccNavigation)
-                    .FirstOrDefaultAsync(m => m.MaSp == id);
-                if (sanPham == null)
+                var hoaDon = await _context.HoaDon
+                    .Include(h => h.MaKhNavigation)
+                    .Include(h => h.MaNvNavigation)
+                    .Include(h => h.MaTrangThaiNavigation)
+                    .FirstOrDefaultAsync(m => m.MaHd == id);
+                if (hoaDon == null)
                 {
                     return NotFound();
                 }
 
-                return View(sanPham);
+                return View(hoaDon);
             }
         }
 
-        // POST: SanPhams/Delete/5
-        [Route("[controller]/[action]")]
+        // POST: HoaDons/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -214,16 +212,21 @@ namespace Cosmetic.Controllers
             }
             else
             {
-                var sanPham = await _context.SanPham.FindAsync(id);
-                _context.SanPham.Remove(sanPham);
+                var hoaDon = await _context.HoaDon.FindAsync(id);
+                var chitietHd = _context.ChiTietHd.Where(m => m.MaHd == id);
+                foreach (var ct in chitietHd)
+                {
+                    _context.ChiTietHd.Remove(ct);
+                }
+                _context.HoaDon.Remove(hoaDon);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
         }
 
-        private bool SanPhamExists(int id)
+        private bool HoaDonExists(int id)
         {
-            return _context.SanPham.Any(e => e.MaSp == id);
+            return _context.HoaDon.Any(e => e.MaHd == id);
         }
     }
 }

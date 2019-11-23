@@ -9,16 +9,16 @@ using Cosmetic.Models;
 
 namespace Cosmetic.Controllers
 {
-    public class SanPhamsController : Controller
+    public class LoaisController : Controller
     {
         private readonly MyPhamContext _context;
 
-        public SanPhamsController(MyPhamContext context)
+        public LoaisController(MyPhamContext context)
         {
             _context = context;
         }
 
-        // GET: SanPhams
+        // GET: Loais
         [Route("[controller]/[action]")]
         public async Task<IActionResult> Index()
         {
@@ -28,12 +28,11 @@ namespace Cosmetic.Controllers
             }
             else
             {
-                var myPhamContext = _context.SanPham.Include(s => s.MaLoaiNavigation).Include(s => s.MaNccNavigation);
-                return View(await myPhamContext.ToListAsync());
+                return View(await _context.Loai.ToListAsync());
             }
         }
 
-        // GET: SanPhams/Details/5
+        // GET: Loais/Details/5
         [Route("[controller]/[action]")]
         public async Task<IActionResult> Details(int? id)
         {
@@ -48,20 +47,18 @@ namespace Cosmetic.Controllers
                     return NotFound();
                 }
 
-                var sanPham = await _context.SanPham
-                    .Include(s => s.MaLoaiNavigation)
-                    .Include(s => s.MaNccNavigation)
-                    .FirstOrDefaultAsync(m => m.MaSp == id);
-                if (sanPham == null)
+                var loai = await _context.Loai
+                    .FirstOrDefaultAsync(m => m.MaLoai == id);
+                if (loai == null)
                 {
                     return NotFound();
                 }
 
-                return View(sanPham);
+                return View(loai);
             }
         }
 
-        // GET: SanPhams/Create
+        // GET: Loais/Create
         [Route("[controller]/[action]")]
         public IActionResult Create()
         {
@@ -71,19 +68,17 @@ namespace Cosmetic.Controllers
             }
             else
             {
-                ViewData["MaLoai"] = new SelectList(_context.Loai, "MaLoai", "MaLoai");
-                ViewData["MaNcc"] = new SelectList(_context.NhaCungCap, "MaNcc", "MaNcc");
                 return View();
             }
         }
 
-        // POST: SanPhams/Create
+        // POST: Loais/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [Route("[controller]/[action]")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("MaSp,TenSp,TenAlias,MaLoai,MoTa,DonGia,Hinh,GiaCu,MaNcc")] SanPham sanPham)
+        public async Task<IActionResult> Create([Bind("MaLoai,TenLoai,TenLoaiAlias,MoTa")] Loai loai)
         {
             if (HttpContext.Session.Get<NhanVien>("MaNv") == null)
             {
@@ -93,17 +88,15 @@ namespace Cosmetic.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    _context.Add(sanPham);
+                    _context.Add(loai);
                     await _context.SaveChangesAsync();
                     return RedirectToAction(nameof(Index));
                 }
-                ViewData["MaLoai"] = new SelectList(_context.Loai, "MaLoai", "MaLoai", sanPham.MaLoai);
-                ViewData["MaNcc"] = new SelectList(_context.NhaCungCap, "MaNcc", "MaNcc", sanPham.MaNcc);
-                return View(sanPham);
+                return View(loai);
             }
         }
 
-        // GET: SanPhams/Edit/5
+        // GET: Loais/Edit/5
         [Route("[controller]/[action]")]
         public async Task<IActionResult> Edit(int? id)
         {
@@ -118,24 +111,22 @@ namespace Cosmetic.Controllers
                     return NotFound();
                 }
 
-                var sanPham = await _context.SanPham.FindAsync(id);
-                if (sanPham == null)
+                var loai = await _context.Loai.FindAsync(id);
+                if (loai == null)
                 {
                     return NotFound();
                 }
-                ViewData["MaLoai"] = new SelectList(_context.Loai, "MaLoai", "MaLoai", sanPham.MaLoai);
-                ViewData["MaNcc"] = new SelectList(_context.NhaCungCap, "MaNcc", "MaNcc", sanPham.MaNcc);
-                return View(sanPham);
+                return View(loai);
             }
         }
 
-        // POST: SanPhams/Edit/5
+        // POST: Loais/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [Route("[controller]/[action]")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("MaSp,TenSp,TenAlias,MaLoai,MoTa,DonGia,Hinh,GiaCu,MaNcc")] SanPham sanPham)
+        public async Task<IActionResult> Edit(int id, [Bind("MaLoai,TenLoai,TenLoaiAlias,MoTa")] Loai loai)
         {
             if (HttpContext.Session.Get<NhanVien>("MaNv") == null)
             {
@@ -143,7 +134,7 @@ namespace Cosmetic.Controllers
             }
             else
             {
-                if (id != sanPham.MaSp)
+                if (id != loai.MaLoai)
                 {
                     return NotFound();
                 }
@@ -152,12 +143,12 @@ namespace Cosmetic.Controllers
                 {
                     try
                     {
-                        _context.Update(sanPham);
+                        _context.Update(loai);
                         await _context.SaveChangesAsync();
                     }
                     catch (DbUpdateConcurrencyException)
                     {
-                        if (!SanPhamExists(sanPham.MaSp))
+                        if (!LoaiExists(loai.MaLoai))
                         {
                             return NotFound();
                         }
@@ -168,13 +159,11 @@ namespace Cosmetic.Controllers
                     }
                     return RedirectToAction(nameof(Index));
                 }
-                ViewData["MaLoai"] = new SelectList(_context.Loai, "MaLoai", "MaLoai", sanPham.MaLoai);
-                ViewData["MaNcc"] = new SelectList(_context.NhaCungCap, "MaNcc", "MaNcc", sanPham.MaNcc);
-                return View(sanPham);
+                return View(loai);
             }
         }
 
-        // GET: SanPhams/Delete/5
+        // GET: Loais/Delete/5
         [Route("[controller]/[action]")]
         public async Task<IActionResult> Delete(int? id)
         {
@@ -189,20 +178,18 @@ namespace Cosmetic.Controllers
                     return NotFound();
                 }
 
-                var sanPham = await _context.SanPham
-                    .Include(s => s.MaLoaiNavigation)
-                    .Include(s => s.MaNccNavigation)
-                    .FirstOrDefaultAsync(m => m.MaSp == id);
-                if (sanPham == null)
+                var loai = await _context.Loai
+                    .FirstOrDefaultAsync(m => m.MaLoai == id);
+                if (loai == null)
                 {
                     return NotFound();
                 }
 
-                return View(sanPham);
+                return View(loai);
             }
         }
 
-        // POST: SanPhams/Delete/5
+        // POST: Loais/Delete/5
         [Route("[controller]/[action]")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
@@ -214,16 +201,16 @@ namespace Cosmetic.Controllers
             }
             else
             {
-                var sanPham = await _context.SanPham.FindAsync(id);
-                _context.SanPham.Remove(sanPham);
+                var loai = await _context.Loai.FindAsync(id);
+                _context.Loai.Remove(loai);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
         }
 
-        private bool SanPhamExists(int id)
+        private bool LoaiExists(int id)
         {
-            return _context.SanPham.Any(e => e.MaSp == id);
+            return _context.Loai.Any(e => e.MaLoai == id);
         }
     }
 }
