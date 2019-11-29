@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,6 +8,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Cosmetic.Models;
 using Cosmetic.Encrytions;
+using OfficeOpenXml;
+using System.Text; 
 
 namespace WebOnline.Controllers
 {
@@ -81,7 +84,7 @@ namespace WebOnline.Controllers
         
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("MaKh,MatKhau,HoTen,GioiTinh,NgaySinh,DiaChi,DienThoai,Email,HieuLuc,VaiTro,RandomKey")] KhachHang khachHang)
+        public async Task<IActionResult> Create([Bind("MaKh,MatKhau,HoTen,GioiTinh,NgaySinh,DiaChi,DienThoai,Email,HieuLuc")] KhachHang khachHang)
         {
             if (HttpContext.Session.Get<NhanVien>("MaNv") == null)
             {
@@ -131,7 +134,7 @@ namespace WebOnline.Controllers
        [Route("[controller]/[action]")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("MaKh,MatKhau,HoTen,GioiTinh,NgaySinh,DiaChi,DienThoai,Email,HieuLuc,VaiTro,RandomKey")] KhachHang khachHang)
+        public async Task<IActionResult> Edit(string id, [Bind("MaKh,MatKhau,HoTen,GioiTinh,NgaySinh,DiaChi,DienThoai,Email,HieuLuc")] KhachHang khachHang)
         {
             if (HttpContext.Session.Get<NhanVien>("MaNv") == null)
             {
@@ -228,7 +231,7 @@ namespace WebOnline.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddnewKhachHang
-([Bind("MaKh,MatKhau,HoTen,GioiTinh,NgaySinh,DiaChi,DienThoai,Email,HieuLuc,VaiTro,RandomKey")] KhachHang khachHang)
+([Bind("MaKh,MatKhau,HoTen,GioiTinh,NgaySinh,DiaChi,DienThoai,Email,HieuLuc")] KhachHang khachHang)
         {
             if (ModelState.IsValid)
             {
@@ -239,6 +242,82 @@ namespace WebOnline.Controllers
                 return RedirectToAction("../Home/Index");
             }
             return View(khachHang);
+        }
+
+
+        [Route("[controller]/[action]")]
+        public IActionResult XuatExcel()
+        {
+            return Xuat("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        }
+
+        [Route("[controller]/[action]")]
+        public IActionResult XuatDoc()
+        {
+            return Xuat("application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+        }
+        [Route("[controller]/[action]")]
+        public IActionResult XuatText()
+        {
+            return Xuat("text");
+        }
+
+        private FileStreamResult Xuat(string filetype)
+        {
+            var data = _context.KhachHang.ToList();
+
+            var stream = new MemoryStream();
+
+            using(var package = new ExcelPackage(stream))
+            {
+                var sheet = package.Workbook.Worksheets.Add("KhachHang");
+                sheet.Cells[1,1].Value = "Họ tên";
+                sheet.Cells[1,2].Value = "Email";
+                sheet.Cells[1,3].Value = "Số điện thoại";
+                sheet.Cells[1,4].Value = "Địa chỉ";
+                int rowIdx = 2;
+                foreach(var p in data)
+                {
+                    sheet.Cells[rowIdx, 1].Value = p.HoTen;
+                    sheet.Cells[rowIdx, 2].Value = p.Email;
+                    sheet.Cells[rowIdx, 3].Value = "+84" + p.DienThoai;
+                    sheet.Cells[rowIdx, 4].Value = p.DiaChi;
+                    ++rowIdx;
+                }   
+                package.Save();
+            }
+
+            stream.Position = 0;
+            if (filetype.Equals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+            {
+                return new FileStreamResult(stream, filetype) 
+                { 
+                    FileDownloadName = "export.xlsx" 
+                };
+            }
+            else if (filetype.Equals("application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
+            {
+                return new FileStreamResult(stream, filetype) 
+                { 
+                    FileDownloadName = "export.docx"
+                };
+            }
+            else 
+            {
+                return new FileStreamResult(stream, "text/plain") 
+                { 
+                    FileDownloadName = "export.txt"
+                };
+            }
+        }
+        private Stream GenerateStreamFromString(string s)
+        {
+            var stream = new MemoryStream();
+            var writer = new StreamWriter(stream);
+            writer.Write(s);
+            writer.Flush();
+            stream.Position = 0;
+            return stream;
         }
     }
 }

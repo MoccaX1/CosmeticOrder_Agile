@@ -314,9 +314,9 @@ namespace Cosmetic.Models
 
                 entity.Property(e => e.NgaySinh).HasColumnType("date");
 
-                entity.Property(e => e.RandomKey)
+                /*entity.Property(e => e.RandomKey)
                     .HasMaxLength(50)
-                    .IsUnicode(false);
+                    .IsUnicode(false);*/
             });
 
             modelBuilder.Entity<KhoHang>(entity =>

@@ -19,6 +19,7 @@ namespace Cosmetic.Controllers
         }
 
         // GET: ChiTietHds
+        [Route("[controller]/[action]")]
         public async Task<IActionResult> Index(int? id)
         {
             if (HttpContext.Session.Get<NhanVien>("MaNv") == null)
@@ -31,6 +32,7 @@ namespace Cosmetic.Controllers
                 return View(await myPhamContext.ToListAsync());
             }
         }
+        [Route("[controller]/[action]")]
         public async Task<IActionResult> ThongKe()
         {
             if (HttpContext.Session.Get<NhanVien>("MaNv") == null)
@@ -45,6 +47,7 @@ namespace Cosmetic.Controllers
         }
 
         // GET: ChiTietHds/Details/5
+        [Route("[controller]/[action]")]
         public async Task<IActionResult> Details(int? id)
         {
             if (HttpContext.Session.Get<NhanVien>("MaNv") == null)
@@ -72,6 +75,7 @@ namespace Cosmetic.Controllers
         }
 
         // GET: ChiTietHds/Create
+        [Route("[controller]/[action]")]
         public IActionResult Create()
         {
             if (HttpContext.Session.Get<NhanVien>("MaNv") == null)
@@ -89,6 +93,7 @@ namespace Cosmetic.Controllers
         // POST: ChiTietHds/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Route("[controller]/[action]")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("MaCt,MaHd,MaSp,DonGia,SoLuong,GiamGia")] ChiTietHd chiTietHd)
@@ -112,6 +117,7 @@ namespace Cosmetic.Controllers
         }
 
         // GET: ChiTietHds/Edit/5
+        [Route("[controller]/[action]")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (HttpContext.Session.Get<NhanVien>("MaNv") == null)
@@ -139,6 +145,7 @@ namespace Cosmetic.Controllers
         // POST: ChiTietHds/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Route("[controller]/[action]")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("MaCt,MaHd,MaSp,DonGia,SoLuong,GiamGia")] ChiTietHd chiTietHd)
@@ -181,6 +188,7 @@ namespace Cosmetic.Controllers
         }
 
         // GET: ChiTietHds/Delete/5
+        [Route("[controller]/[action]")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (HttpContext.Session.Get<NhanVien>("MaNv") == null)
@@ -208,6 +216,7 @@ namespace Cosmetic.Controllers
         }
 
         // POST: ChiTietHds/Delete/5
+        [Route("[controller]/[action]")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

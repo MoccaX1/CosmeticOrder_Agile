@@ -31,8 +31,8 @@ namespace Cosmetic.Models
         [Display(Name = "Hiệu lực")]
         public bool? HieuLuc { get; set; }
         [Display(Name = "Vai trò")]
-        public int? VaiTro { get; set; }
-        public string RandomKey { get; set; }
+        //public int? VaiTro { get; set; }
+        //public string RandomKey { get; set; }
 
         public ICollection<BanBe> BanBe { get; set; }
         public ICollection<BinhLuan> BinhLuan { get; set; }

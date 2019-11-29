@@ -98,7 +98,7 @@ namespace Cosmetic.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("[controller]/[action]")]
-        public async Task<IActionResult>DangKy([Bind("MaKh,MatKhau,HoTen,GioiTinh,NgaySinh,DiaChi,DienThoai,Email,HieuLuc,VaiTro,RandomKey")] KhachHang khachHang)
+        public async Task<IActionResult>DangKy([Bind("MaKh,MatKhau,HoTen,GioiTinh,NgaySinh,DiaChi,DienThoai,Email,HieuLuc")] KhachHang khachHang)
         {
             phonenum = khachHang.DienThoai;
             try 
