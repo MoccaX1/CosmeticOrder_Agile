@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Cosmetic.Helper;
 using Cosmetic.Models;
 using Microsoft.AspNetCore.Mvc;
-
+using Cosmetic.Services.OnePay;
 namespace Cosmetic.Controllers
 {
     public class GioHangController : Controller
@@ -15,7 +16,7 @@ namespace Cosmetic.Controllers
             db = context;
         }
 
-        [Route("gio-hang")]
+        [Route("giohang")]
         public IActionResult Index()
         {
             return View(Carts);
@@ -88,5 +89,12 @@ namespace Cosmetic.Controllers
             HttpContext.Session.Remove("GioHang");
             return RedirectToAction("Index");
         }
+
+     
+       
+
+        
+          
+
     }
 }

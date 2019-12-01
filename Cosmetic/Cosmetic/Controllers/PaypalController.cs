@@ -73,7 +73,7 @@ namespace Cosmetic.Controllers
             HttpContext.Session.Set("ThongTin", thongTin);
             return RedirectToAction("ThanhToan1", "ThanhToan");
         }
-        //[HttpPost]
+        [HttpPost]
 
         [Route("[controller]/[action]")]
         public async Task<IActionResult> PaypalPayment(string makh, string hotenkh, string diachikh, string sdt, string tennhan, string sdtnhan, string diachinhan, string ghichunhan)
@@ -139,7 +139,7 @@ namespace Cosmetic.Controllers
                     db.SaveChanges();
                 }
             }
-            Payment payment = _payPal.CreatePayment(total, @"https://obaju.azurewebsites.net/Paypal/Success", @"https://obaju.azurewebsites.net/Paypal/Fail", "sale", items);
+            Payment payment = _payPal.CreatePayment(total, @"http://localhost:53148", @"http://localhost:53148", "sale", items);
             string paypalRedirectUrl = await _payPal.ExecutePayment(payment);
             if (paypalRedirectUrl == "fail")
             {

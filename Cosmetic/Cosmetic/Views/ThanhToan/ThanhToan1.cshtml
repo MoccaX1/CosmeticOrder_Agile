@@ -3,7 +3,43 @@
     ViewData["Title"] = "ThanhToan1";
     Layout = "~/Views/Shared/_Frontend.cshtml";
 }
+<script>
+    function PayPalPaymentEvent(eventid) {
 
+    var URL = 'https://www.paypal.com/cgi-bin/webscr?';
+        var cmd = '_xclick';
+
+        var business = "Cosmetic@business.com";
+    var currency_code = 'AUD';
+    var amount = 100;
+        var item_name = colorRadio;
+    var item_number = test2;
+        var returnurl = 'http://localhost:59401/';
+        var cancel_return = 'http://localhost:59401/';
+    var notify_url = 'http://WebFacingSite/API/PayPalReg';
+    var tax = (amount * 0.10);
+
+    var fullURL = URL + 'cmd=' + cmd + '&business=' + business + '&currency_code=' + currency_code + '&amount=' + amount + '&tax=' + tax + '&item_name=' + item_name + '&item_number=' + item_number + '&return=' + returnurl + '&cancel_return=' + cancel_return + '&notify_url=' + notify_url;
+
+    ///// this ajax bit I use to record the transaction has started
+    $.ajax({
+    contentType: 'application/json; charset=utf-8',
+    dataType: 'json',
+    url: '/API/PaymentStarted?eventid=' + eventid + '&UserID=' + UserID + '&paymentID' + paymentID,
+    error: function () {
+    SetMessage('error', 'Something has gone horribly, horribly wrong')
+    },
+    success: function (data) {
+
+    window.location.href = fullURL;
+
+    },
+    type: 'POST'
+    });
+
+
+    }
+</script>
 <script>
     function myFunction() {
         alert("Đặt hàng thành công! Bạn có thể theo dõi đơn hàng của mình.");
@@ -197,15 +233,22 @@
                                 </div>
                                 @if (Context.Session.Get<List<CartItem>>("GioHang") != null)
                                 {
+                                <div>
                                     <div>
-                                        <div>
-                                            <a><input type="radio" id="test1" name="colorRadio" value="cod"><label for="test1">Thanh toán khi nhận hàng &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>  </a>
-                                            <a><input type="radio" id="test2" name="colorRadio" value="paypal"><label for="test2">Thanh toán bằng Paypal&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label> </a>
-                                        </div>
-                                        <a asp-action="DatHang" asp-controller="ThanhToan"><button style="position:relative;left:28px;top:7px;" type="submit" class="cod box1 btn btn-primary" onclick="myFunction()">Xác nhận đặt hàng</button></a>
 
-                                        <a data-layout="horizontal" asp-action="PaypalPayment" asp-controller="Paypal" data-size="medium" data-funding-source="paypal" style="position:relative;left:250px;top:7px;" data-button="" class="paypal box1" checkout-btn paypal-button paypal-button-number-0 paypal-button-layout-horizontal paypal-button-shape-pill paypal-button-branding-branded paypal-button-number-single paypal-button-env-production paypal-should-focus paypal-button-label-checkout paypal-button-color-gold paypal-button-logo-color-blue" role="button" aria-label="paypal" tabindex="0"><img class="paypal-button-logo paypal-button-logo-pp paypal-button-logo-gold" src="" alt="paypal" style="visibility: visible;"><span class="paypal-button-text" style="display: inline-block; visibility: visible;"></span></a>
-                                   </div>
+                                        <a><input type="radio" id="test1" name="colorRadio" value="cod"><label for="test1">Thanh toán khi nhận hàng &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>  </a>
+                                        <a><input type="radio" id="test2" name="colorRadio" value="paypal"><label for="test2">Thanh toán bằng Paypal&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label> </a>
+                                        <a><input type="radio" id="test3" name="colorRadio" value="OnePay"><label for="test3">Thanh toán bằng Bảo kim &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>  </a>
+                                    </div>
+                                    <a asp-action="DatHang" asp-controller="ThanhToan"><button style="position:relative;left:28px;top:7px;" type="submit" class="cod box1 btn btn-primary" onclick="myFunction()">Xác nhận đặt hàng</button></a>
+
+                                    <a asp-controller="GioHang" asp-action="PaypalPayment" class="text-right">
+                                        <button type="submit" style="background: none; padding:0;"><img src="~/images./checkpp.png" /></button>
+                                    </a>
+                                    <a asp-controller="GioHang" asp-action="PaypalPayment" class="text-right">
+                                        <button type="submit" style="background: none; padding:0;"><img src="~/images./onepay.png" /></button>
+                                    </a>
+                                </div>
 
                                 }
                                 else
@@ -214,6 +257,7 @@
                                 }
                             </div>
                         </form>
+
                     }
                     else
                     {
@@ -222,10 +266,14 @@
                         <div class="alert alert-danger" style="text-align:center"> <a asp-action="DangNhap" asp-controller="DangNhap">Bạn cần đăng nhập để tiếp tục mua hàng </a></div>
 
                         <div class="box-footer d-flex justify-content-between">
-                            <a asp-action="Index" asp-controller="GioHang" class="btn btn-outline-secondary"><i class="fa fa-chevron-left"></i>Quay lại giỏ hàng</a>
+                            <a asp-action="action" asp-controller="Paypal" class="btn btn-outline-secondary"><i class="fa fa-chevron-left"></i>Quay lại giỏ hàng</a>
                         </div>
                     }
+
                 </div>
+
+
+
                 <!-- /.box-->
             </div>
             <!-- /.col-lg-9-->

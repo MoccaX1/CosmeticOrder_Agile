@@ -42,5 +42,6 @@ namespace Cosmetic.Models
         public string AuthyId { get; set; }
         public string PhoneNumber { get; set; }
         public bool PhoneNumberConfirmed { get; set; }
+       
     }
 }

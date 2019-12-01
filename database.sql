@@ -1,12 +1,12 @@
-USE [master]
-GO
+--USE [master]
+--GO
 /****** Object:  Database [MyPham]    Script Date: 12/21/18 9:27:14 PM ******/
 CREATE DATABASE [MyPham]
  CONTAINMENT = NONE
- ON  PRIMARY 
-( NAME = N'MyPham', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL11.SQLEXPRESS\MSSQL\DATA\MyPham.mdf' , SIZE = 3136KB , MAXSIZE = UNLIMITED, FILEGROWTH = 1024KB )
- LOG ON 
-( NAME = N'MyPham_log', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL11.SQLEXPRESS\MSSQL\DATA\MyPham_log.ldf' , SIZE = 1088KB , MAXSIZE = 2048GB , FILEGROWTH = 10%)
+ --ON  PRIMARY 
+--( NAME = N'MyPham', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL11.SQLEXPRESS\MSSQL\DATA\MyPham.mdf' , SIZE = 3136KB , MAXSIZE = UNLIMITED, FILEGROWTH = 1024KB )
+-- LOG ON 
+--( NAME = N'MyPham_log', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL11.SQLEXPRESS\MSSQL\DATA\MyPham_log.ldf' , SIZE = 1088KB , MAXSIZE = 2048GB , FILEGROWTH = 10%)
 GO
 ALTER DATABASE [MyPham] SET COMPATIBILITY_LEVEL = 110
 GO
@@ -877,3 +877,7 @@ GO
 
 ALTER TABLE [dbo].[KhachHang] ADD [PhoneNumberConfirmed] bit DEFAULT (0)
 GO
+update KhachHang  
+set [PhoneNumberConfirmed]=0
+where MaKH=N'trang'
+select*from khachhang
