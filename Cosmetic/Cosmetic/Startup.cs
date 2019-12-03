@@ -70,9 +70,8 @@ namespace Cosmetic
             //services.AddDbContext<MyPhamContext>(options => options.UseSqlServer(Configuration.GetConnectionString("WebMyPham")));
             //////////////////////////////////////////////////////////////////////////////////////////////
             
-            //services.AddSingleton<IPayPalPayment, PayPalPayment>();
-
-            //services.Configure<PayPalAuthOptions>(Configuration.GetSection("PayPalPayment"));
+            services.AddSingleton<IPayPalPayment, PayPalPayment>();
+            services.Configure<PayPalAuthOptions>(Configuration.GetSection("PayPalPayment"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
