@@ -233,22 +233,14 @@
                                 </div>
                                 @if (Context.Session.Get<List<CartItem>>("GioHang") != null)
                                 {
-                                <div>
                                     <div>
+                                        <div>
 
-                                        <a><input type="radio" id="test1" name="colorRadio" value="cod"><label for="test1">Thanh toán khi nhận hàng &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>  </a>
-                                        <a><input type="radio" id="test2" name="colorRadio" value="paypal"><label for="test2">Thanh toán bằng Paypal&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label> </a>
-                                        <a><input type="radio" id="test3" name="colorRadio" value="OnePay"><label for="test3">Thanh toán bằng Bảo kim &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>  </a>
+                                            <a><input type="radio" id="test1" name="colorRadio" value="cod"><label for="test1">Thanh toán khi nhận hàng &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>  </a>
+   
+                                        </div>
+                                        <a asp-action="DatHang" asp-controller="ThanhToan"><button style="position:relative;left:28px;top:7px;" type="submit" class="cod box1 btn btn-primary" onclick="myFunction()">Xác nhận đặt hàng</button></a>
                                     </div>
-                                    <a asp-action="DatHang" asp-controller="ThanhToan"><button style="position:relative;left:28px;top:7px;" type="submit" class="cod box1 btn btn-primary" onclick="myFunction()">Xác nhận đặt hàng</button></a>
-
-                                    <a asp-controller="GioHang" asp-action="PaypalPayment" class="text-right">
-                                        <button type="submit" style="background: none; padding:0;"><img src="~/images./checkpp.png" /></button>
-                                    </a>
-                                    <a asp-controller="GioHang" asp-action="PaypalPayment" class="text-right">
-                                        <button type="submit" style="background: none; padding:0;"><img src="~/images./onepay.png" /></button>
-                                    </a>
-                                </div>
 
                                 }
                                 else
@@ -257,6 +249,28 @@
                                 }
                             </div>
                         </form>
+                        if (Context.Session.Get<List<CartItem>>("GioHang") != null)
+                        {
+                            <a asp-controller="Paypal" asp-action="PaypalPayment">
+                                <button style="background: none; padding:0;"><img src="~/images./checkpp.png" /></button>
+                            </a>
+                            <a data-layout="horizontal" asp-action="PaypalPayment" asp-controller="Paypal">
+                                <button  style="background: none; padding:0;"><img src="~/images./onepay.png" /></button>
+                            </a>
+                        }
+                        else
+
+                        {
+                            <a asp-controller="Paypal" asp-action="PaypalPayment">
+                                <button disabled style="background: none; padding:0;"><img src="~/images./checkpp.png" /></button>
+                            </a>
+                            <a data-layout="horizontal" asp-action="PaypalPayment" asp-controller="Paypal">
+                                <button disabled style="background: none; padding:0;"><img src="~/images./onepay.png" /></button>
+                            </a>
+                        }
+
+
+
 
                     }
                     else

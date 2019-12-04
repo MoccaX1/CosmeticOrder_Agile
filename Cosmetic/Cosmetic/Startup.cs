@@ -17,6 +17,7 @@ using Services.PayPal;
 using Cosmetic.Models;
 using Cosmetic.GATagHelpers;
 using EC.SecurityService.Services;
+using EMarket.Services.PayPal;
 
 namespace Cosmetic
 {
@@ -70,9 +71,9 @@ namespace Cosmetic
             services.AddDbContext<MyPhamContext>(options => options.UseSqlServer(Configuration.GetConnectionString("WebMyPham")));
             //////////////////////////////////////////////////////////////////////////////////////////////
             
-            //services.AddSingleton<IPayPalPayment, PayPalPayment>();
+            services.AddSingleton<IPayPalPayment, PayPalPayment>();
 
-            //services.Configure<PayPalAuthOptions>(Configuration.GetSection("PayPalPayment"));
+            services.Configure<PayPalAuthOptions>(Configuration.GetSection("PayPalPayment"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -34,7 +34,8 @@ namespace Cosmetic.Controllers
             return View();
         }
         [Route("[controller]/[action]")]
-        public async Task<IActionResult> DangNhap(LoginViewModel model)
+      //  public async Task<IActionResult> DangNhap(LoginViewModel model)
+      public ActionResult DangNhap(LoginViewModel model)
         {
             if (ModelState.IsValid)
             {
@@ -47,7 +48,13 @@ namespace Cosmetic.Controllers
                 }
                 else
                 {
-                    try
+                    HttpContext.Session.Set("TaiKhoan", kh);
+                    return RedirectToAction("Index", "Home");
+
+                    #region try catch
+                    /*try
+
+
                     {
                         //HttpContext.Session.Set("TaiKhoan", kh);
                         //return RedirectToAction("Index", "Home");
@@ -64,7 +71,7 @@ namespace Cosmetic.Controllers
                                     //Send SMS success
                                     return View("XacMinhDangNhap");
                                     throw new UserDefException($"Gửi token thành công tới {phonenum}");
-                                    
+
                                 }
                                 else
                                 {
@@ -83,9 +90,10 @@ namespace Cosmetic.Controllers
                     catch (Exception e)
                     {
                          ViewBag.Result = e.Message;
-                    }
+                    }*/
+        # endregion
                 }
-                
+               
             }
             return View("Index");
         }

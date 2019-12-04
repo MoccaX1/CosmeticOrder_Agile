@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using ReflectionIT.Mvc.Paging;
 using Cosmetic.Models;
 
+
 namespace Cosmetic.Controllers
 {
     public class SanPhamController : Controller
@@ -20,8 +21,8 @@ namespace Cosmetic.Controllers
 
         [Route("san-pham/{loai}")]
         public async Task<IActionResult> Index(string loai, string mucgia, string sapxep, string thuonghieu, int page = 1)
-        {       
-            
+        {
+
             var qry = db.SanPham.AsNoTracking().OrderBy(p => p.MaSp);
             var model = await PagingList.CreateAsync(qry, 12, page);
             if (loai != null)
@@ -29,8 +30,8 @@ namespace Cosmetic.Controllers
                 ViewBag.Loai = db.Loai.SingleOrDefault(p => p.TenLoaiSeoUrl == loai);
                 Loai qery1 = db.Loai.SingleOrDefault(p => p.TenLoaiSeoUrl == loai);
                 var qery = db.SanPham.Where(p => p.MaLoai == qery1.MaLoai).AsNoTracking().OrderBy(p => p.MaSp);
-                ThuongHieu qery2 = db.ThuongHieu.SingleOrDefault(p => p.MaHieu.ToString() == thuonghieu);              
-                
+                ThuongHieu qery2 = db.ThuongHieu.SingleOrDefault(p => p.MaHieu.ToString() == thuonghieu);
+
                 if (thuonghieu == "tatca")
                 {
                     qery = qery.Where(p => p.MaLoai == qery1.MaLoai).AsNoTracking().OrderBy(p => p.MaSp);
@@ -38,7 +39,7 @@ namespace Cosmetic.Controllers
                 else
                 {
                     bool check = false;
-                    var dsThuongHieu = db.ThuongHieu.ToList();                                                       
+                    var dsThuongHieu = db.ThuongHieu.ToList();
                     foreach (var item in dsThuongHieu)
                     {
                         if (item.MaHieu.ToString() == thuonghieu)
@@ -50,7 +51,7 @@ namespace Cosmetic.Controllers
 
                     if (check == true)
                     {
-                        qery = qery.Where(p=> p.MaHieu == qery2.MaHieu).AsNoTracking().OrderBy(p=>p.MaHieu);
+                        qery = qery.Where(p => p.MaHieu == qery2.MaHieu).AsNoTracking().OrderBy(p => p.MaHieu);
                     }
                 }
 
@@ -60,28 +61,28 @@ namespace Cosmetic.Controllers
                         qery = qery.Where(p => p.DonGia < 100000).OrderBy(p => p.MaSp);
                         break;
                     case "500000":
-                        qery = qery.Where(p => p.DonGia >= 100000 && p.DonGia <500000).OrderBy(p => p.MaSp);                        
+                        qery = qery.Where(p => p.DonGia >= 100000 && p.DonGia < 500000).OrderBy(p => p.MaSp);
                         break;
                     case "1000000":
-                        qery = qery.Where(p => p.DonGia >= 500000 && p.DonGia <1000000).OrderBy(p => p.MaSp);                        
+                        qery = qery.Where(p => p.DonGia >= 500000 && p.DonGia < 1000000).OrderBy(p => p.MaSp);
                         break;
                     case "1000001":
-                        qery = qery.Where(p => p.DonGia >= 1000000).OrderBy(p => p.MaSp);                        
+                        qery = qery.Where(p => p.DonGia >= 1000000).OrderBy(p => p.MaSp);
                         break;
                     case "tatca":
-                       qery = qery.Where(p => p.MaLoai == qery1.MaLoai).AsNoTracking().OrderBy(p => p.MaSp);                       
-                       break;
+                        qery = qery.Where(p => p.MaLoai == qery1.MaLoai).AsNoTracking().OrderBy(p => p.MaSp);
+                        break;
                     default:
                         break;
                 }
 
-                switch(sapxep)
+                switch (sapxep)
                 {
                     case "tang":
                         qery = qery.OrderBy(p => p.DonGia);
                         break;
                     case "giam":
-                        qery = qery.OrderByDescending(p => p.DonGia);;
+                        qery = qery.OrderByDescending(p => p.DonGia); ;
                         break;
                     case "tatca":
                         qery = qery.Where(p => p.MaLoai == qery1.MaLoai).AsNoTracking().OrderBy(p => p.MaSp);
@@ -92,7 +93,7 @@ namespace Cosmetic.Controllers
 
                 var md = await PagingList.CreateAsync(qery, 99, page);
 
-                
+
                 return View(md);
             }
 
@@ -132,7 +133,7 @@ namespace Cosmetic.Controllers
             }
             return View(hh);
         }
-        
+
         public IActionResult timKiem()
         {
             return View();
@@ -173,7 +174,7 @@ namespace Cosmetic.Controllers
                 NoiDung = noidung,
 
             };
-            
+
             db.BinhLuan.Add(bl);
             db.SaveChanges();
             return RedirectToAction("ChiTiet", "SanPham", new { url = urls, loai = loais });

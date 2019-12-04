@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BraintreeHttp;
+using EMarket.Services.PayPal;
 using Microsoft.Extensions.Options;
 using PayPal.Core;
 using PayPal.v1.Payments;
@@ -88,13 +89,13 @@ namespace Services.PayPal
                 {
                     Items = items
                 },
-                //payee = new Payee
-                //{
-                //    // TODO.. Enter the payee email address here
-                //    email = "Dungbui321@gmail.com",
+               // Payee = new Payee
+              // {
+                  // TODO.. Enter the payee email address here
+                //  Email = "Cosmetic@business.com",
 
-                //    // TODO.. Enter the merchant id here
-                //    merchant_id = "RPMTSCM7UFWBL"
+                   // TODO.. Enter the merchant id here
+                  //  MerchantId = "3VDGNRZN3JTZ8"
                 //}
             });
             return transactionList;
@@ -118,6 +119,8 @@ namespace Services.PayPal
                     {
                         //saving the payapalredirect URL to which user will be redirected for payment  
                         paypalRedirectUrl = lnk.Href;
+                        // saving the paymentID in the key guid
+                     
                     }
                 }
                 return paypalRedirectUrl;

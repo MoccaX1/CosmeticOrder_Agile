@@ -2,14 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using BraintreeHttp;
 using Microsoft.AspNetCore.Mvc;
-using PayPal.Core;
 using PayPal.v1.Payments;
-using Services.PayPal;
-using Cosmetic.Helper;
 using Cosmetic.Models;
-
+using EMarket.Services.PayPal;
 
 namespace Cosmetic.Controllers
 {
@@ -23,6 +19,7 @@ namespace Cosmetic.Controllers
         {
             _payPal = payPal;
         }
+
         public List<CartItem> Carts
         {
             get
@@ -73,7 +70,7 @@ namespace Cosmetic.Controllers
             HttpContext.Session.Set("ThongTin", thongTin);
             return RedirectToAction("ThanhToan1", "ThanhToan");
         }
-        [HttpPost]
+        //[HttpPost]
 
         [Route("[controller]/[action]")]
         public async Task<IActionResult> PaypalPayment(string makh, string hotenkh, string diachikh, string sdt, string tennhan, string sdtnhan, string diachinhan, string ghichunhan)
@@ -139,25 +136,40 @@ namespace Cosmetic.Controllers
                     db.SaveChanges();
                 }
             }
-            Payment payment = _payPal.CreatePayment(total, @"http://localhost:53148", @"http://localhost:53148", "sale", items);
+            Payment payment = _payPal.CreatePayment(total, @"http://localhost:61494/thanh-toan-1", @"http://localhost:61494/thanh-toan-1", "sale", items);
             string paypalRedirectUrl = await _payPal.ExecutePayment(payment);
             if (paypalRedirectUrl == "fail")
+
             {
+              
+                    hd.MaTrangThai = 0;
+                    db.SaveChanges();
+                TempData["status"] = "Thanh toán thất bại";
                 return RedirectToAction("Fail");
             }
-            return Redirect(paypalRedirectUrl);
+            else
+            {
+                hd.MaTrangThai = 1;
+                db.SaveChanges();
+                TempData["status"] = "Thanh toán đơn hàng thanh cong";
+                return Redirect(paypalRedirectUrl);
+            }
         }
-
+        
         [Route("[controller]/[action]")]
         public IActionResult Success()
         {
+          
+          
             return Content("Thanh toán thành công");
         }
 
         [Route("[controller]/[action]")]
         public IActionResult Fail()
         {
-            //Tạo đơn hàng trong CSDL với trạng thái : Chưa thanh toán, phương thức: 
+            //Tạo đơn hàng trong CSDL trạng thái Chưa thanh toán
+
+            TempData["status"] = "Thanh toán đơn hàng thất bại xin vui lòng thử lại";
             return Content("Thanh toán thất bại");
         }
 

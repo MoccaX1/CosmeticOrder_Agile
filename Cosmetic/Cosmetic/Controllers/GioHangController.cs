@@ -16,7 +16,7 @@ namespace Cosmetic.Controllers
             db = context;
         }
 
-        [Route("giohang")]
+        [Route("gio-hang")]
         public IActionResult Index()
         {
             return View(Carts);
